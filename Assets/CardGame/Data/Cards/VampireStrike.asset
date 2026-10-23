@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 325bb1251223dec40ab8554a9124f001, type: 3}
+  m_Name: VampireStrike
+  m_EditorClassIdentifier: Assembly-CSharp::CardData
+  cardName: "\uD761\uD608\uC758 \uC77C\uACA9"
+  cost: 2
+  effects:
+  - effect: {fileID: 11400000, guid: ade05c82fd951ce49831a3da2bfd3532, type: 2}
+    value: 8
+  - effect: {fileID: 11400000, guid: 247faf042ca5d5449b832296d540f617, type: 2}
+    value: 4
