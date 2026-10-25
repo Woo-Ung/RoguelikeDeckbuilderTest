@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,37 +11,52 @@ public class CardSelectionManager : MonoBehaviour
     private void Start()
     {
         upgradeButton.onClick.AddListener(UpgradeSelectedCard);
+
+        UpdateUpgradeButton();
     }
 
     public void SelectCard(CardView card)
     {
-        selectedCard = card;
+        // 이전에 선택된 카드의 강조 해제
+        if (selectedCard != null)
+        {
+            selectedCard.SetSelected(false);
+        }
 
-        Debug.Log($"선택한 카드: {card.name}");
+        // 새로운 카드 선택
+        selectedCard = card;
+        selectedCard.SetSelected(true);
+
+        UpdateUpgradeButton();
     }
 
     public void ClearSelection(CardView card)
     {
-        if(selectedCard == card)
-        {
-            selectedCard = null;
-        }
+        if (selectedCard != card)
+            return;
+
+        selectedCard.SetSelected(false);
+        selectedCard = null;
+
+        UpdateUpgradeButton();
+    }
+
+    private void UpdateUpgradeButton()
+    {
+        upgradeButton.interactable = selectedCard != null;
     }
 
     private void UpgradeSelectedCard()
     {
         if (selectedCard == null)
-        {
-            Debug.Log("선택된 카드가 없습니다.");
             return;
-        }
 
         selectedCard.UpgradeCard();
     }
 
     private void OnDestroy()
     {
-        if(upgradeButton != null)
+        if (upgradeButton != null)
         {
             upgradeButton.onClick.RemoveListener(UpgradeSelectedCard);
         }
