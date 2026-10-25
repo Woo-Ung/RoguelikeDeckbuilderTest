@@ -1,7 +1,6 @@
-
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class CardView : MonoBehaviour
 {
@@ -33,6 +32,10 @@ public class CardView : MonoBehaviour
     private Enemy target;
     private CardSelectionManager selectionManager;
     private PlayerEnergy playerEnergy;
+    private CardManager cardManager;
+
+    public CardInstance CardInstance => cardInstance;
+
 
     public void SetSelected(bool isSelected)
     {
@@ -41,8 +44,6 @@ public class CardView : MonoBehaviour
     }
 
     // 카드 초기화
-
-
     public void Initialize(
         CardInstance instance,
         Player player,
@@ -50,7 +51,8 @@ public class CardView : MonoBehaviour
         CardSelectionManager manager,
         TurnManager turnManager,
         BattleManager battleManager,
-        PlayerEnergy energy)
+        PlayerEnergy energy,
+        CardManager cardManager)
     {
         cardInstance = instance;
         this.player = player;
@@ -59,6 +61,7 @@ public class CardView : MonoBehaviour
         this.turnManager = turnManager;
         this.battleManager = battleManager;
         playerEnergy = energy;
+        this.cardManager = cardManager;
 
         cardNameText.text = cardInstance.Data.cardName;
         costText.text = cardInstance.CurrentCost.ToString();
@@ -78,8 +81,25 @@ public class CardView : MonoBehaviour
         battleManager.OnBattleEnded -= UpdateCardAvailability;
         battleManager.OnBattleEnded += UpdateCardAvailability;
 
+        cardManager.OnCardPlayed -= HandleCardPlayed;
+        cardManager.OnCardPlayed += HandleCardPlayed;
+
         UpdateCardAvailability();
     }
+
+
+    private void HandleCardPlayed(CardInstance playedCard)
+    {
+        // 다른 카드가 사용되었다면 무시
+        if (playedCard != cardInstance)
+            return;
+
+        selectionManager.ClearSelection(this);
+
+        Destroy(gameObject);
+    }
+
+
 
     private void UpdateCardAvailability()
     {
@@ -125,27 +145,30 @@ public class CardView : MonoBehaviour
     }
 
     // 카드 사용
-
-
     private void UseCard()
     {
         if (turnManager == null ||
             battleManager == null ||
             playerEnergy == null ||
+            cardManager == null ||
             !turnManager.IsPlayerTurn ||
             !battleManager.IsBattleActive)
         {
             return;
         }
 
-        // 에너지가 부족하면 카드 사용 실패
+        // 손패에 존재하는 카드인지 확인
+        if (!cardManager.HasCardInHand(cardInstance))
+            return;
+
+        // 에너지 소비
         if (!playerEnergy.TryUseEnergy(cardInstance.CurrentCost))
         {
             Debug.Log("에너지가 부족합니다.");
             return;
         }
 
-        // 카드에 등록된 효과 실행
+        // 카드 효과 실행
         for (int i = 0; i < cardInstance.Data.effects.Count; i++)
         {
             if (!battleManager.IsBattleActive)
@@ -161,9 +184,8 @@ public class CardView : MonoBehaviour
             entry.effect.Execute(player, target, value);
         }
 
-        selectionManager.ClearSelection(this);
-
-        Destroy(gameObject);
+        // 카드 이동은 CardManager가 담당
+        cardManager.PlayCard(cardInstance);
     }
 
 
@@ -210,6 +232,11 @@ public class CardView : MonoBehaviour
         if (selectButton != null)
         {
             selectButton.onClick.RemoveListener(SelectCard);
+        }
+
+        if (cardManager != null)
+        {
+            cardManager.OnCardPlayed -= HandleCardPlayed;
         }
     }
 

@@ -1,4 +1,4 @@
-
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -17,6 +17,9 @@ public class TurnManager : MonoBehaviour
     [SerializeField] private TMP_Text turnText;
     [SerializeField] private BattleManager battleManager;
     [SerializeField] private PlayerEnergy playerEnergy;
+
+    public event Action OnPlayerTurnStarted;
+    public event Action OnPlayerTurnEnded;
 
     public TurnState CurrentTurn { get; private set; }
 
@@ -54,14 +57,17 @@ public class TurnManager : MonoBehaviour
 
         turnText.text = "플레이어 턴";
         endTurnButton.interactable = true;
-    }
 
+        OnPlayerTurnStarted?.Invoke();
+    }
 
 
     public void EndPlayerTurn()
     {
         if (!battleManager.IsBattleActive || !IsPlayerTurn)
             return;
+
+        OnPlayerTurnEnded?.Invoke();
 
         CurrentTurn = TurnState.Enemy;
 
@@ -70,8 +76,6 @@ public class TurnManager : MonoBehaviour
 
         ProcessEnemyTurn();
     }
-
-
 
     private void ProcessEnemyTurn()
     {
