@@ -13,6 +13,11 @@ public class CardSpawner : MonoBehaviour
     [SerializeField] private Enemy enemy;
     [SerializeField] private CardSelectionManager selectionManager;
 
+    [SerializeField] private TurnManager turnManager;
+    [SerializeField] private BattleManager battleManager;
+    [SerializeField] private PlayerEnergy playerEnergy;
+
+
     private void Start()
     {
         foreach (CardData data in cardDatas)
@@ -20,8 +25,14 @@ public class CardSpawner : MonoBehaviour
             CardInstance instance = new CardInstance(data);
 
             CardView card = Instantiate(cardPrefab, cardParent);
-
-            card.Initialize(instance, player, enemy, selectionManager);        
+            card.Initialize(
+    instance,
+    player,
+    enemy,
+    selectionManager,
+    turnManager,
+    battleManager,
+    playerEnergy);
         }        
     }
 }

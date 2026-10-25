@@ -5,6 +5,8 @@ using TMPro;
 
 public class CardView : MonoBehaviour
 {
+  
+
     [Header("Selection UI")]
     [SerializeField] private Image cardBackground;
     [SerializeField] private Color normalColor = Color.white;
@@ -19,11 +21,13 @@ public class CardView : MonoBehaviour
     [SerializeField] private Button cardButton;
     [SerializeField] private Button selectButton;
 
-
+    private BattleManager battleManager;
+    private TurnManager turnManager;
     private CardInstance cardInstance;
     private Player player;
     private Enemy target;
     private CardSelectionManager selectionManager;
+    private PlayerEnergy playerEnergy;
 
     public void SetSelected(bool isSelected)
     {
@@ -32,29 +36,38 @@ public class CardView : MonoBehaviour
     }
 
     // 카드 초기화
+
+
     public void Initialize(
         CardInstance instance,
         Player player,
         Enemy enemy,
-        CardSelectionManager manager)
+        CardSelectionManager manager,
+        TurnManager turnManager,
+        BattleManager battleManager,
+        PlayerEnergy energy)
     {
         cardInstance = instance;
         this.player = player;
         target = enemy;
         selectionManager = manager;
+        this.turnManager = turnManager;
+        this.battleManager = battleManager;
+        playerEnergy = energy;
 
         cardNameText.text = cardInstance.Data.cardName;
         costText.text = cardInstance.CurrentCost.ToString();
 
         UpdateEffectText();
+        SetSelected(false);
 
         cardButton.onClick.RemoveListener(UseCard);
         cardButton.onClick.AddListener(UseCard);
 
         selectButton.onClick.RemoveListener(SelectCard);
         selectButton.onClick.AddListener(SelectCard);
-        SetSelected(false);
     }
+
 
     // 카드 효과 수치 UI 갱신
     private void UpdateEffectText()
@@ -77,10 +90,32 @@ public class CardView : MonoBehaviour
     }
 
     // 카드 사용
+
+
     private void UseCard()
     {
+        if (turnManager == null ||
+            battleManager == null ||
+            playerEnergy == null ||
+            !turnManager.IsPlayerTurn ||
+            !battleManager.IsBattleActive)
+        {
+            return;
+        }
+
+        // 에너지가 부족하면 카드 사용 실패
+        if (!playerEnergy.TryUseEnergy(cardInstance.CurrentCost))
+        {
+            Debug.Log("에너지가 부족합니다.");
+            return;
+        }
+
+        // 카드에 등록된 효과 실행
         for (int i = 0; i < cardInstance.Data.effects.Count; i++)
         {
+            if (!battleManager.IsBattleActive)
+                break;
+
             CardEffectEntry entry = cardInstance.Data.effects[i];
 
             if (entry.effect == null)
@@ -91,12 +126,11 @@ public class CardView : MonoBehaviour
             entry.effect.Execute(player, target, value);
         }
 
-        // 사용한 카드가 선택되어 있었다면 선택 해제
         selectionManager.ClearSelection(this);
 
-        // 사용한 카드 제거
         Destroy(gameObject);
     }
+
 
     // 카드 선택
     private void SelectCard()

@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System;
 
 public class Player : MonoBehaviour
 {
@@ -7,6 +8,9 @@ public class Player : MonoBehaviour
     [SerializeField] private TMP_Text healthText;
 
     private int currentHealth;
+
+    public event Action OnHealthChanged;
+    public bool IsDead => currentHealth <= 0;
 
     private void Start()
     {
@@ -17,14 +21,21 @@ public class Player : MonoBehaviour
     public void TakeDamage(int damage)
     {
         currentHealth = Mathf.Max(0, currentHealth - damage);
+
         UpdateHealthUI();
+
+        OnHealthChanged?.Invoke();
     }
 
     public void Heal(int amount)
     {
         currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
+
         UpdateHealthUI();
+
+        OnHealthChanged?.Invoke();
     }
+
 
     private void UpdateHealthUI()
     {

@@ -1,15 +1,19 @@
-
+using System;
 using UnityEngine;
 using TMPro;
 
 public class Enemy : MonoBehaviour
 {
     [SerializeField] private int maxHealth = 50;
+    [SerializeField] private int attackDamage = 5;
     [SerializeField] private TMP_Text healthText;
     [SerializeField] private TMP_Text poisonText;
 
     private int currentHealth;
     private int poisonStack;
+
+    public bool IsDead => currentHealth <= 0;
+    public event Action OnHealthChanged;
 
     private void Start()
     {
@@ -19,11 +23,24 @@ public class Enemy : MonoBehaviour
         UpdateUI();
     }
 
+    public void Attack(Player player)
+    {
+        if (currentHealth <= 0)
+            return;
+
+        player.TakeDamage(attackDamage);
+    }
+
     public void TakeDamage(int damage)
     {
         currentHealth = Mathf.Max(0, currentHealth - damage);
+
         UpdateUI();
+
+        OnHealthChanged?.Invoke();
     }
+
+
 
     public void AddPoison(int amount)
     {
