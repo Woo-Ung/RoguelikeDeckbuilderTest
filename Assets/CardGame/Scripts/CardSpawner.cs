@@ -1,38 +1,45 @@
-using System;
-using UnityEditor.Search;
+
 using UnityEngine;
-using UnityEngine.UI;
 
 public class CardSpawner : MonoBehaviour
 {
     [SerializeField] private CardView cardPrefab;
     [SerializeField] private Transform cardParent;
-    [SerializeField] private CardData[] cardDatas;
 
+    [SerializeField] private CardManager cardManager;
     [SerializeField] private Player player;
     [SerializeField] private Enemy enemy;
     [SerializeField] private CardSelectionManager selectionManager;
-
     [SerializeField] private TurnManager turnManager;
     [SerializeField] private BattleManager battleManager;
     [SerializeField] private PlayerEnergy playerEnergy;
 
-
-    private void Start()
+    private void OnEnable()
     {
-        foreach (CardData data in cardDatas)
-        {
-            CardInstance instance = new CardInstance(data);
+        if (cardManager != null)
+            cardManager.OnCardDrawn += CreateCardView;
+    }
 
-            CardView card = Instantiate(cardPrefab, cardParent);
-            card.Initialize(
-    instance,
-    player,
-    enemy,
-    selectionManager,
-    turnManager,
-    battleManager,
-    playerEnergy);
-        }        
+    private void OnDisable()
+    {
+        if (cardManager != null)
+            cardManager.OnCardDrawn -= CreateCardView;
+    }
+
+    private void CreateCardView(CardInstance instance)
+    {
+        CardView card = Instantiate(
+            cardPrefab,
+            cardParent
+        );
+
+        card.Initialize(
+            instance,
+            player,
+            enemy,
+            selectionManager,
+            turnManager,
+            battleManager,
+            playerEnergy);
     }
 }
