@@ -286,6 +286,7 @@ GameObject:
   - component: {fileID: 2825122930276645639}
   - component: {fileID: 6480987451957223815}
   - component: {fileID: 8235733304150066563}
+  - component: {fileID: 7291370685443771484}
   m_Layer: 5
   m_Name: CardView
   m_TagString: Untagged
@@ -373,8 +374,22 @@ MonoBehaviour:
   cardNameText: {fileID: 2667514588443680351}
   costText: {fileID: 2532245999996322666}
   damageText: {fileID: 3913086514440592128}
+  canvasGroup: {fileID: 7291370685443771484}
+  disabledAlpha: 0.5
   cardButton: {fileID: 6307116968509068681}
   selectButton: {fileID: 5735765922126627676}
+--- !u!225 &7291370685443771484
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5294453103737883747}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &6662636917974688029
 GameObject:
   m_ObjectHideFlags: 0

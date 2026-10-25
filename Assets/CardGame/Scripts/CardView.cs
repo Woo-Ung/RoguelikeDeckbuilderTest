@@ -17,6 +17,11 @@ public class CardView : MonoBehaviour
     [SerializeField] private TMP_Text costText;
     [SerializeField] private TMP_Text damageText;
 
+    [Header("Card Availability")]
+    [SerializeField] private CanvasGroup canvasGroup;
+    [SerializeField, Range(0f, 1f)]
+    private float disabledAlpha = 0.5f;
+
     [Header("Buttons")]
     [SerializeField] private Button cardButton;
     [SerializeField] private Button selectButton;
@@ -66,6 +71,36 @@ public class CardView : MonoBehaviour
 
         selectButton.onClick.RemoveListener(SelectCard);
         selectButton.onClick.AddListener(SelectCard);
+
+        playerEnergy.OnEnergyChanged -= UpdateCardAvailability;
+        playerEnergy.OnEnergyChanged += UpdateCardAvailability;
+
+        battleManager.OnBattleEnded -= UpdateCardAvailability;
+        battleManager.OnBattleEnded += UpdateCardAvailability;
+
+        UpdateCardAvailability();
+    }
+
+    private void UpdateCardAvailability()
+    {
+        if (cardInstance == null ||
+            playerEnergy == null ||
+            battleManager == null ||
+            turnManager == null)
+        {
+            return;
+        }
+
+        bool canUseCard =
+            battleManager.IsBattleActive &&
+            turnManager.IsPlayerTurn &&
+            playerEnergy.CanUseEnergy(
+                cardInstance.CurrentCost);
+
+        cardButton.interactable = canUseCard;
+
+        canvasGroup.alpha =
+            canUseCard ? 1f : disabledAlpha;
     }
 
 
@@ -152,12 +187,30 @@ public class CardView : MonoBehaviour
         UpdateEffectText();
     }
 
+
     private void OnDestroy()
     {
+        if (playerEnergy != null)
+        {
+            playerEnergy.OnEnergyChanged -=
+                UpdateCardAvailability;
+        }
+
+        if (battleManager != null)
+        {
+            battleManager.OnBattleEnded -=
+                UpdateCardAvailability;
+        }
+
         if (cardButton != null)
+        {
             cardButton.onClick.RemoveListener(UseCard);
+        }
 
         if (selectButton != null)
+        {
             selectButton.onClick.RemoveListener(SelectCard);
+        }
     }
+
 }
