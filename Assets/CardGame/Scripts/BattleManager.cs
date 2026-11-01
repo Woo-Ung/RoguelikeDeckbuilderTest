@@ -1,5 +1,6 @@
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 using TMPro;
@@ -14,13 +15,15 @@ public class BattleManager : MonoBehaviour
     }
 
     [SerializeField, FormerlySerializedAs("player")] private Player _player;
-    [SerializeField, FormerlySerializedAs("enemy")] private Enemy _enemy;
+    [SerializeField] private Enemy[] _enemies;
     [SerializeField, FormerlySerializedAs("resultText")] private TMP_Text _resultText;
 
     public BattleState CurrentState { get; private set; }
 
     public bool IsBattleActive =>
         CurrentState == BattleState.Playing;
+
+    public IReadOnlyList<Enemy> Enemies => _enemies;
 
     public event Action OnBattleEnded;
 
@@ -33,13 +36,21 @@ public class BattleManager : MonoBehaviour
     private void OnEnable()
     {
         _player.OnHealthChanged += CheckBattleResult;
-        _enemy.OnHealthChanged += CheckBattleResult;
+
+        foreach (Enemy enemy in _enemies)
+        {
+            enemy.OnHealthChanged += CheckBattleResult;
+        }
     }
 
     private void OnDisable()
     {
         _player.OnHealthChanged -= CheckBattleResult;
-        _enemy.OnHealthChanged -= CheckBattleResult;
+
+        foreach (Enemy enemy in _enemies)
+        {
+            enemy.OnHealthChanged -= CheckBattleResult;
+        }
     }
 
     public void CheckBattleResult()
@@ -47,7 +58,7 @@ public class BattleManager : MonoBehaviour
         if (!IsBattleActive)
             return;
 
-        if (_enemy.IsDead)
+        if (AreAllEnemiesDead())
         {
             CurrentState = BattleState.Victory;
             _resultText.text = "승리!";
@@ -63,5 +74,16 @@ public class BattleManager : MonoBehaviour
         }
 
         OnBattleEnded?.Invoke();
+    }
+
+    private bool AreAllEnemiesDead()
+    {
+        foreach (Enemy enemy in _enemies)
+        {
+            if (!enemy.IsDead)
+                return false;
+        }
+
+        return true;
     }
 }
