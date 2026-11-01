@@ -6,8 +6,6 @@ using UnityEngine.Serialization;
 
 public class CardManager : MonoBehaviour
 {
-    [Header("Starting Deck")]
-    [SerializeField, FormerlySerializedAs("startingCards")] private CardData[] _startingCards;
     [SerializeField, FormerlySerializedAs("turnManager")] private TurnManager _turnManager;
     [SerializeField, FormerlySerializedAs("cardsPerTurn")] private int _cardsPerTurn = 5;
 
@@ -116,7 +114,8 @@ public class CardManager : MonoBehaviour
         _hand.Clear();
         _discardPile.Clear();
 
-        foreach (CardData data in _startingCards)
+        // 런 덱을 기준으로 전투 덱 생성
+        foreach (CardData data in RunManager.Instance.Deck)
         {
             if (data == null)
                 continue;

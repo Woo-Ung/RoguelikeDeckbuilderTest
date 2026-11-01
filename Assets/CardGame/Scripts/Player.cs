@@ -5,15 +5,16 @@ using System;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField, FormerlySerializedAs("maxHealth")] private int _maxHealth = 50;
     [SerializeField, FormerlySerializedAs("healthText")] private TMP_Text _healthText;
     [SerializeField] private TMP_Text _blockText;
     [SerializeField] private TMP_Text _poisonText;
 
+    private int _maxHealth;
     private int _currentHealth;
 
     public event Action OnHealthChanged;
     public bool IsDead => _currentHealth <= 0;
+    public int CurrentHealth => _currentHealth;
     public CombatStatus Status { get; } = new CombatStatus();
 
     private void OnEnable()
@@ -28,7 +29,9 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-        _currentHealth = _maxHealth;
+        // 체력은 런 데이터에서 이어받음
+        _maxHealth = RunManager.Instance.MaxHealth;
+        _currentHealth = RunManager.Instance.CurrentHealth;
         UpdateHealthUI();
         UpdateStatusUI();
     }

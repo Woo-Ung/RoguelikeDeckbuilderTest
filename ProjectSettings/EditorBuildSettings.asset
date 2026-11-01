@@ -4,6 +4,15 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/CardGame/Scene/MainMenu.unity
+    guid: b62ac29b86b8b894ebd5ac3c318efcc0
+  - enabled: 1
+    path: Assets/CardGame/Scene/Battle.unity
+    guid: 87fe66e611d2b70459e14536f96caaef
+  - enabled: 1
+    path: Assets/CardGame/Scene/Result.unity
+    guid: b733be06a0303294a9611813d61abad7
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
