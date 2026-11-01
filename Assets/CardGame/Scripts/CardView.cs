@@ -1,46 +1,47 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class CardView : MonoBehaviour
 {
-  
+
 
     [Header("Selection UI")]
-    [SerializeField] private Image cardBackground;
-    [SerializeField] private Color normalColor = Color.white;
-    [SerializeField] private Color selectedColor = Color.yellow;
+    [SerializeField, FormerlySerializedAs("cardBackground")] private Image _cardBackground;
+    [SerializeField, FormerlySerializedAs("normalColor")] private Color _normalColor = Color.white;
+    [SerializeField, FormerlySerializedAs("selectedColor")] private Color _selectedColor = Color.yellow;
 
     [Header("Card UI")]
-    [SerializeField] private TMP_Text cardNameText;
-    [SerializeField] private TMP_Text costText;
-    [SerializeField] private TMP_Text damageText;
+    [SerializeField, FormerlySerializedAs("cardNameText")] private TMP_Text _cardNameText;
+    [SerializeField, FormerlySerializedAs("costText")] private TMP_Text _costText;
+    [SerializeField, FormerlySerializedAs("damageText")] private TMP_Text _damageText;
 
     [Header("Card Availability")]
-    [SerializeField] private CanvasGroup canvasGroup;
-    [SerializeField, Range(0f, 1f)]
-    private float disabledAlpha = 0.5f;
+    [SerializeField, FormerlySerializedAs("canvasGroup")] private CanvasGroup _canvasGroup;
+    [SerializeField, Range(0f, 1f), FormerlySerializedAs("disabledAlpha")]
+    private float _disabledAlpha = 0.5f;
 
     [Header("Buttons")]
-    [SerializeField] private Button cardButton;
-    [SerializeField] private Button selectButton;
+    [SerializeField, FormerlySerializedAs("cardButton")] private Button _cardButton;
+    [SerializeField, FormerlySerializedAs("selectButton")] private Button _selectButton;
 
-    private BattleManager battleManager;
-    private TurnManager turnManager;
-    private CardInstance cardInstance;
-    private Player player;
-    private Enemy target;
-    private CardSelectionManager selectionManager;
-    private PlayerEnergy playerEnergy;
-    private CardManager cardManager;
+    private BattleManager _battleManager;
+    private TurnManager _turnManager;
+    private CardInstance _cardInstance;
+    private Player _player;
+    private Enemy _target;
+    private CardSelectionManager _selectionManager;
+    private PlayerEnergy _playerEnergy;
+    private CardManager _cardManager;
 
-    public CardInstance CardInstance => cardInstance;
+    public CardInstance CardInstance => _cardInstance;
 
 
     public void SetSelected(bool isSelected)
     {
-        cardBackground.color =
-            isSelected ? selectedColor : normalColor;
+        _cardBackground.color =
+            isSelected ? _selectedColor : _normalColor;
     }
 
     // 카드 초기화
@@ -54,35 +55,35 @@ public class CardView : MonoBehaviour
         PlayerEnergy energy,
         CardManager cardManager)
     {
-        cardInstance = instance;
-        this.player = player;
-        target = enemy;
-        selectionManager = manager;
-        this.turnManager = turnManager;
-        this.battleManager = battleManager;
-        playerEnergy = energy;
-        this.cardManager = cardManager;
+        _cardInstance = instance;
+        _player = player;
+        _target = enemy;
+        _selectionManager = manager;
+        _turnManager = turnManager;
+        _battleManager = battleManager;
+        _playerEnergy = energy;
+        _cardManager = cardManager;
 
-        cardNameText.text = cardInstance.Data.cardName;
-        costText.text = cardInstance.CurrentCost.ToString();
+        _cardNameText.text = _cardInstance.Data.CardName;
+        _costText.text = _cardInstance.CurrentCost.ToString();
 
         UpdateEffectText();
         SetSelected(false);
 
-        cardButton.onClick.RemoveListener(UseCard);
-        cardButton.onClick.AddListener(UseCard);
+        _cardButton.onClick.RemoveListener(UseCard);
+        _cardButton.onClick.AddListener(UseCard);
 
-        selectButton.onClick.RemoveListener(SelectCard);
-        selectButton.onClick.AddListener(SelectCard);
+        _selectButton.onClick.RemoveListener(SelectCard);
+        _selectButton.onClick.AddListener(SelectCard);
 
-        playerEnergy.OnEnergyChanged -= UpdateCardAvailability;
-        playerEnergy.OnEnergyChanged += UpdateCardAvailability;
+        _playerEnergy.OnEnergyChanged -= UpdateCardAvailability;
+        _playerEnergy.OnEnergyChanged += UpdateCardAvailability;
 
-        battleManager.OnBattleEnded -= UpdateCardAvailability;
-        battleManager.OnBattleEnded += UpdateCardAvailability;
+        _battleManager.OnBattleEnded -= UpdateCardAvailability;
+        _battleManager.OnBattleEnded += UpdateCardAvailability;
 
-        cardManager.OnCardPlayed -= HandleCardPlayed;
-        cardManager.OnCardPlayed += HandleCardPlayed;
+        _cardManager.OnCardPlayed -= HandleCardPlayed;
+        _cardManager.OnCardPlayed += HandleCardPlayed;
 
         UpdateCardAvailability();
     }
@@ -91,10 +92,10 @@ public class CardView : MonoBehaviour
     private void HandleCardPlayed(CardInstance playedCard)
     {
         // 다른 카드가 사용되었다면 무시
-        if (playedCard != cardInstance)
+        if (playedCard != _cardInstance)
             return;
 
-        selectionManager.ClearSelection(this);
+        _selectionManager.ClearSelection(this);
 
         Destroy(gameObject);
     }
@@ -103,108 +104,108 @@ public class CardView : MonoBehaviour
 
     private void UpdateCardAvailability()
     {
-        if (cardInstance == null ||
-            playerEnergy == null ||
-            battleManager == null ||
-            turnManager == null)
+        if (_cardInstance == null ||
+            _playerEnergy == null ||
+            _battleManager == null ||
+            _turnManager == null)
         {
             return;
         }
 
         bool canUseCard =
-            battleManager.IsBattleActive &&
-            turnManager.IsPlayerTurn &&
-            playerEnergy.CanUseEnergy(
-                cardInstance.CurrentCost);
+            _battleManager.IsBattleActive &&
+            _turnManager.IsPlayerTurn &&
+            _playerEnergy.CanUseEnergy(
+                _cardInstance.CurrentCost);
 
-        cardButton.interactable = canUseCard;
+        _cardButton.interactable = canUseCard;
 
-        canvasGroup.alpha =
-            canUseCard ? 1f : disabledAlpha;
+        _canvasGroup.alpha =
+            canUseCard ? 1f : _disabledAlpha;
     }
 
 
     // 카드 효과 수치 UI 갱신
     private void UpdateEffectText()
     {
-        damageText.text = "";
+        _damageText.text = "";
 
-        for (int i = 0; i < cardInstance.Data.effects.Count; i++)
+        for (int i = 0; i < _cardInstance.Data.Effects.Count; i++)
         {
-            CardEffectEntry entry = cardInstance.Data.effects[i];
+            CardEffectEntry entry = _cardInstance.Data.Effects[i];
 
-            if (entry.effect == null)
+            if (entry.Effect == null)
                 continue;
 
-            int value = cardInstance.GetEffectValue(i);
+            int value = _cardInstance.GetEffectValue(i);
 
-            string description = entry.effect.GetDescription(value);
+            string description = entry.Effect.GetDescription(value);
 
-            damageText.text += description + "\n";
+            _damageText.text += description + "\n";
         }
     }
 
     // 카드 사용
     private void UseCard()
     {
-        if (turnManager == null ||
-            battleManager == null ||
-            playerEnergy == null ||
-            cardManager == null ||
-            !turnManager.IsPlayerTurn ||
-            !battleManager.IsBattleActive)
+        if (_turnManager == null ||
+            _battleManager == null ||
+            _playerEnergy == null ||
+            _cardManager == null ||
+            !_turnManager.IsPlayerTurn ||
+            !_battleManager.IsBattleActive)
         {
             return;
         }
 
         // 손패에 존재하는 카드인지 확인
-        if (!cardManager.HasCardInHand(cardInstance))
+        if (!_cardManager.HasCardInHand(_cardInstance))
             return;
 
         // 에너지 소비
-        if (!playerEnergy.TryUseEnergy(cardInstance.CurrentCost))
+        if (!_playerEnergy.TryUseEnergy(_cardInstance.CurrentCost))
         {
             Debug.Log("에너지가 부족합니다.");
             return;
         }
 
         // 카드 효과 실행
-        for (int i = 0; i < cardInstance.Data.effects.Count; i++)
+        for (int i = 0; i < _cardInstance.Data.Effects.Count; i++)
         {
-            if (!battleManager.IsBattleActive)
+            if (!_battleManager.IsBattleActive)
                 break;
 
-            CardEffectEntry entry = cardInstance.Data.effects[i];
+            CardEffectEntry entry = _cardInstance.Data.Effects[i];
 
-            if (entry.effect == null)
+            if (entry.Effect == null)
                 continue;
 
-            int value = cardInstance.GetEffectValue(i);
+            int value = _cardInstance.GetEffectValue(i);
 
-            entry.effect.Execute(player, target, value);
+            entry.Effect.Execute(_player, _target, value);
         }
 
         // 카드 이동은 CardManager가 담당
-        cardManager.PlayCard(cardInstance);
+        _cardManager.PlayCard(_cardInstance);
     }
 
 
     // 카드 선택
     private void SelectCard()
     {
-        selectionManager.SelectCard(this);
+        _selectionManager.SelectCard(this);
     }
 
     // 선택된 카드 강화
     public void UpgradeCard()
     {
-        if (cardInstance == null)
+        if (_cardInstance == null)
             return;
 
-        if (cardInstance.Data.effects.Count == 0)
+        if (_cardInstance.Data.Effects.Count == 0)
             return;
 
-        cardInstance.UpgradeEffect(0, 3);
+        _cardInstance.UpgradeEffect(0, 3);
 
         UpdateEffectText();
     }
@@ -212,31 +213,31 @@ public class CardView : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (playerEnergy != null)
+        if (_playerEnergy != null)
         {
-            playerEnergy.OnEnergyChanged -=
+            _playerEnergy.OnEnergyChanged -=
                 UpdateCardAvailability;
         }
 
-        if (battleManager != null)
+        if (_battleManager != null)
         {
-            battleManager.OnBattleEnded -=
+            _battleManager.OnBattleEnded -=
                 UpdateCardAvailability;
         }
 
-        if (cardButton != null)
+        if (_cardButton != null)
         {
-            cardButton.onClick.RemoveListener(UseCard);
+            _cardButton.onClick.RemoveListener(UseCard);
         }
 
-        if (selectButton != null)
+        if (_selectButton != null)
         {
-            selectButton.onClick.RemoveListener(SelectCard);
+            _selectButton.onClick.RemoveListener(SelectCard);
         }
 
-        if (cardManager != null)
+        if (_cardManager != null)
         {
-            cardManager.OnCardPlayed -= HandleCardPlayed;
+            _cardManager.OnCardPlayed -= HandleCardPlayed;
         }
     }
 

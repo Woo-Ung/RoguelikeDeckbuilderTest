@@ -1,26 +1,27 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 using TMPro;
 using System;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] private int maxHealth = 50;
-    [SerializeField] private TMP_Text healthText;
+    [SerializeField, FormerlySerializedAs("maxHealth")] private int _maxHealth = 50;
+    [SerializeField, FormerlySerializedAs("healthText")] private TMP_Text _healthText;
 
-    private int currentHealth;
+    private int _currentHealth;
 
     public event Action OnHealthChanged;
-    public bool IsDead => currentHealth <= 0;
+    public bool IsDead => _currentHealth <= 0;
 
     private void Start()
     {
-        currentHealth = 30;
+        _currentHealth = _maxHealth;
         UpdateHealthUI();
     }
 
     public void TakeDamage(int damage)
     {
-        currentHealth = Mathf.Max(0, currentHealth - damage);
+        _currentHealth = Mathf.Max(0, _currentHealth - damage);
 
         UpdateHealthUI();
 
@@ -29,7 +30,7 @@ public class Player : MonoBehaviour
 
     public void Heal(int amount)
     {
-        currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
+        _currentHealth = Mathf.Min(_maxHealth, _currentHealth + amount);
 
         UpdateHealthUI();
 
@@ -39,7 +40,7 @@ public class Player : MonoBehaviour
 
     private void UpdateHealthUI()
     {
-        healthText.text = $"{currentHealth} / {maxHealth}";
+        _healthText.text = $"{_currentHealth} / {_maxHealth}";
     }
 
 }

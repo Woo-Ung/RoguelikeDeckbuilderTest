@@ -1,39 +1,40 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 using TMPro;
 
 public class Enemy : MonoBehaviour
 {
-    [SerializeField] private int maxHealth = 50;
-    [SerializeField] private int attackDamage = 5;
-    [SerializeField] private TMP_Text healthText;
-    [SerializeField] private TMP_Text poisonText;
+    [SerializeField, FormerlySerializedAs("maxHealth")] private int _maxHealth = 50;
+    [SerializeField, FormerlySerializedAs("attackDamage")] private int _attackDamage = 5;
+    [SerializeField, FormerlySerializedAs("healthText")] private TMP_Text _healthText;
+    [SerializeField, FormerlySerializedAs("poisonText")] private TMP_Text _poisonText;
 
-    private int currentHealth;
-    private int poisonStack;
+    private int _currentHealth;
+    private int _poisonStack;
 
-    public bool IsDead => currentHealth <= 0;
+    public bool IsDead => _currentHealth <= 0;
     public event Action OnHealthChanged;
 
     private void Start()
     {
-        currentHealth = maxHealth;
-        poisonStack = 0;
+        _currentHealth = _maxHealth;
+        _poisonStack = 0;
 
         UpdateUI();
     }
 
     public void Attack(Player player)
     {
-        if (currentHealth <= 0)
+        if (_currentHealth <= 0)
             return;
 
-        player.TakeDamage(attackDamage);
+        player.TakeDamage(_attackDamage);
     }
 
     public void TakeDamage(int damage)
     {
-        currentHealth = Mathf.Max(0, currentHealth - damage);
+        _currentHealth = Mathf.Max(0, _currentHealth - damage);
 
         UpdateUI();
 
@@ -44,25 +45,25 @@ public class Enemy : MonoBehaviour
 
     public void AddPoison(int amount)
     {
-        poisonStack += Mathf.Max(0, amount);
+        _poisonStack += Mathf.Max(0, amount);
         UpdateUI();
     }
 
     public void ProcessPoison()
     {
-        if (poisonStack <= 0 || currentHealth <= 0)
+        if (_poisonStack <= 0 || _currentHealth <= 0)
             return;
 
-        TakeDamage(poisonStack);
+        TakeDamage(_poisonStack);
 
-        poisonStack = Mathf.Max(0, poisonStack - 1);
+        _poisonStack = Mathf.Max(0, _poisonStack - 1);
 
         UpdateUI();
     }
 
     private void UpdateUI()
     {
-        healthText.text = $"{currentHealth} / {maxHealth}";
-        poisonText.text = $"중독: {poisonStack}";
+        _healthText.text = $"{_currentHealth} / {_maxHealth}";
+        _poisonText.text = $"중독: {_poisonStack}";
     }
 }

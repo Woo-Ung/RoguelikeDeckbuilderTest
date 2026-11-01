@@ -1,49 +1,50 @@
 
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class CardSpawner : MonoBehaviour
 {
-    [SerializeField] private CardView cardPrefab;
-    [SerializeField] private Transform cardParent;
+    [SerializeField, FormerlySerializedAs("cardPrefab")] private CardView _cardPrefab;
+    [SerializeField, FormerlySerializedAs("cardParent")] private Transform _cardParent;
 
-    [SerializeField] private CardManager cardManager;
-    [SerializeField] private Player player;
-    [SerializeField] private Enemy enemy;
-    [SerializeField] private CardSelectionManager selectionManager;
-    [SerializeField] private TurnManager turnManager;
-    [SerializeField] private BattleManager battleManager;
-    [SerializeField] private PlayerEnergy playerEnergy;
+    [SerializeField, FormerlySerializedAs("cardManager")] private CardManager _cardManager;
+    [SerializeField, FormerlySerializedAs("player")] private Player _player;
+    [SerializeField, FormerlySerializedAs("enemy")] private Enemy _enemy;
+    [SerializeField, FormerlySerializedAs("selectionManager")] private CardSelectionManager _selectionManager;
+    [SerializeField, FormerlySerializedAs("turnManager")] private TurnManager _turnManager;
+    [SerializeField, FormerlySerializedAs("battleManager")] private BattleManager _battleManager;
+    [SerializeField, FormerlySerializedAs("playerEnergy")] private PlayerEnergy _playerEnergy;
 
     private void OnEnable()
     {
-        if (cardManager == null)
+        if (_cardManager == null)
             return;
 
-        cardManager.OnCardDrawn += CreateCardView;
-        cardManager.OnCardDiscarded += RemoveCardView;
+        _cardManager.OnCardDrawn += CreateCardView;
+        _cardManager.OnCardDiscarded += RemoveCardView;
     }
 
     private void OnDisable()
     {
-        if (cardManager == null)
+        if (_cardManager == null)
             return;
 
-        cardManager.OnCardDrawn -= CreateCardView;
-        cardManager.OnCardDiscarded -= RemoveCardView;
+        _cardManager.OnCardDrawn -= CreateCardView;
+        _cardManager.OnCardDiscarded -= RemoveCardView;
     }
 
     private void RemoveCardView(CardInstance instance)
     {
         // 현재 손패에 생성된 카드 UI 검색
         CardView[] cards =
-            cardParent.GetComponentsInChildren<CardView>();
+            _cardParent.GetComponentsInChildren<CardView>();
 
         foreach (CardView card in cards)
         {
             if (card.CardInstance != instance)
                 continue;
 
-            selectionManager.ClearSelection(card);
+            _selectionManager.ClearSelection(card);
             Destroy(card.gameObject);
             break;
         }
@@ -52,19 +53,19 @@ public class CardSpawner : MonoBehaviour
     private void CreateCardView(CardInstance instance)
     {
         CardView card = Instantiate(
-            cardPrefab,
-            cardParent
+            _cardPrefab,
+            _cardParent
         );
 
         card.Initialize(
             instance,
-            player,
-            enemy,
-            selectionManager,
-            turnManager,
-            battleManager,
-            playerEnergy,
-            cardManager);
+            _player,
+            _enemy,
+            _selectionManager,
+            _turnManager,
+            _battleManager,
+            _playerEnergy,
+            _cardManager);
     }
 
 }

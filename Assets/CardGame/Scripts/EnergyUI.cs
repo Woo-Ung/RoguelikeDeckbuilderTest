@@ -1,16 +1,17 @@
 
 using UnityEngine;
+using UnityEngine.Serialization;
 using TMPro;
 
 public class EnergyUI : MonoBehaviour
 {
-    [SerializeField] private PlayerEnergy playerEnergy;
-    [SerializeField] private TMP_Text energyText;
+    [SerializeField, FormerlySerializedAs("playerEnergy")] private PlayerEnergy _playerEnergy;
+    [SerializeField, FormerlySerializedAs("energyText")] private TMP_Text _energyText;
 
     private void OnEnable()
     {
-        if (playerEnergy != null)
-            playerEnergy.OnEnergyChanged += UpdateEnergyUI;
+        if (_playerEnergy != null)
+            _playerEnergy.OnEnergyChanged += UpdateEnergyUI;
     }
 
     private void Start()
@@ -20,16 +21,16 @@ public class EnergyUI : MonoBehaviour
 
     private void OnDisable()
     {
-        if (playerEnergy != null)
-            playerEnergy.OnEnergyChanged -= UpdateEnergyUI;
+        if (_playerEnergy != null)
+            _playerEnergy.OnEnergyChanged -= UpdateEnergyUI;
     }
 
     private void UpdateEnergyUI()
     {
-        if (playerEnergy == null || energyText == null)
+        if (_playerEnergy == null || _energyText == null)
             return;
 
-        energyText.text =
-            $"{playerEnergy.CurrentEnergy} / {playerEnergy.MaxEnergy}";
+        _energyText.text =
+            $"{_playerEnergy.CurrentEnergy} / {_playerEnergy.MaxEnergy}";
     }
 }

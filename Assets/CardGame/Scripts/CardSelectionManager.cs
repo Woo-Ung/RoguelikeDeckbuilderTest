@@ -1,16 +1,17 @@
 
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class CardSelectionManager : MonoBehaviour
 {
-    [SerializeField] private Button upgradeButton;
+    [SerializeField, FormerlySerializedAs("upgradeButton")] private Button _upgradeButton;
 
-    private CardView selectedCard;
+    private CardView _selectedCard;
 
     private void Start()
     {
-        upgradeButton.onClick.AddListener(UpgradeSelectedCard);
+        _upgradeButton.onClick.AddListener(UpgradeSelectedCard);
 
         UpdateUpgradeButton();
     }
@@ -18,47 +19,47 @@ public class CardSelectionManager : MonoBehaviour
     public void SelectCard(CardView card)
     {
         // 이전에 선택된 카드의 강조 해제
-        if (selectedCard != null)
+        if (_selectedCard != null)
         {
-            selectedCard.SetSelected(false);
+            _selectedCard.SetSelected(false);
         }
 
         // 새로운 카드 선택
-        selectedCard = card;
-        selectedCard.SetSelected(true);
+        _selectedCard = card;
+        _selectedCard.SetSelected(true);
 
         UpdateUpgradeButton();
     }
 
     public void ClearSelection(CardView card)
     {
-        if (selectedCard != card)
+        if (_selectedCard != card)
             return;
 
-        selectedCard.SetSelected(false);
-        selectedCard = null;
+        _selectedCard.SetSelected(false);
+        _selectedCard = null;
 
         UpdateUpgradeButton();
     }
 
     private void UpdateUpgradeButton()
     {
-        upgradeButton.interactable = selectedCard != null;
+        _upgradeButton.interactable = _selectedCard != null;
     }
 
     private void UpgradeSelectedCard()
     {
-        if (selectedCard == null)
+        if (_selectedCard == null)
             return;
 
-        selectedCard.UpgradeCard();
+        _selectedCard.UpgradeCard();
     }
 
     private void OnDestroy()
     {
-        if (upgradeButton != null)
+        if (_upgradeButton != null)
         {
-            upgradeButton.onClick.RemoveListener(UpgradeSelectedCard);
+            _upgradeButton.onClick.RemoveListener(UpgradeSelectedCard);
         }
     }
 }

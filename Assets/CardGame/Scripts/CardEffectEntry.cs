@@ -1,9 +1,13 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class CardEffectEntry
 {
-    public CardEffect effect;
-    public int value;
+    [SerializeField, FormerlySerializedAs("effect")] private CardEffect _effect;
+    [SerializeField, FormerlySerializedAs("value")] private int _value;
+
+    public CardEffect Effect => _effect;
+    public int Value => _value;
 }
