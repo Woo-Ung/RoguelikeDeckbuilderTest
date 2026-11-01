@@ -63,6 +63,7 @@
 ## 5. 산출물
 
 - 양식 : `Docs\Template\Plan Template.md`
+- 작성 규칙 : `Docs\Documentation\Plan Rule.md`
 - 저장 위치 : `Docs\Plan\[계획명] Plan.md`
 - 계획서는 나중에 참고하는 자료이며, 규칙 문서가 아니다.
     - 계획서와 규칙 문서(`TechSpec.md`, `Docs\Claude\Code\` 등)의 내용이 다르면 규칙 문서를 따르고, 그 차이를 사용자에게 보고한다.
