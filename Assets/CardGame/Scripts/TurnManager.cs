@@ -52,6 +52,11 @@ public class TurnManager : MonoBehaviour
         if (!_battleManager.IsBattleActive)
             return;
 
+        _player.StartTurn();
+
+        if (!_battleManager.IsBattleActive)
+            return;
+
         CurrentTurn = TurnState.Player;
 
         _playerEnergy.RestoreEnergy();
@@ -80,7 +85,7 @@ public class TurnManager : MonoBehaviour
 
     private void ProcessEnemyTurn()
     {
-        _enemy.ProcessPoison();
+        _enemy.StartTurn();
 
         if (!_battleManager.IsBattleActive)
             return;

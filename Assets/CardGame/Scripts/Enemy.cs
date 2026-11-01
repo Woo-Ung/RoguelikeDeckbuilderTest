@@ -11,15 +11,24 @@ public class Enemy : MonoBehaviour
     [SerializeField, FormerlySerializedAs("poisonText")] private TMP_Text _poisonText;
 
     private int _currentHealth;
-    private int _poisonStack;
 
     public bool IsDead => _currentHealth <= 0;
     public event Action OnHealthChanged;
+    public CombatStatus Status { get; } = new CombatStatus();
+
+    private void OnEnable()
+    {
+        Status.OnStatusChanged += UpdateUI;
+    }
+
+    private void OnDisable()
+    {
+        Status.OnStatusChanged -= UpdateUI;
+    }
 
     private void Start()
     {
         _currentHealth = _maxHealth;
-        _poisonStack = 0;
 
         UpdateUI();
     }
@@ -34,36 +43,49 @@ public class Enemy : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        _currentHealth = Mathf.Max(0, _currentHealth - damage);
+        int remainingDamage = Status.AbsorbDamage(damage);
 
-        UpdateUI();
-
-        OnHealthChanged?.Invoke();
+        LoseHealth(remainingDamage);
     }
 
 
 
     public void AddPoison(int amount)
     {
-        _poisonStack += Mathf.Max(0, amount);
-        UpdateUI();
+        Status.AddPoison(amount);
     }
 
-    public void ProcessPoison()
+    // 자기 턴 시작 시 방어도 초기화 및 중독 처리
+    public void StartTurn()
     {
-        if (_poisonStack <= 0 || _currentHealth <= 0)
+        Status.ResetBlock();
+        ProcessPoison();
+    }
+
+    private void ProcessPoison()
+    {
+        if (IsDead)
             return;
 
-        TakeDamage(_poisonStack);
+        int poisonDamage = Status.ConsumePoison();
 
-        _poisonStack = Mathf.Max(0, _poisonStack - 1);
+        if (poisonDamage > 0)
+            LoseHealth(poisonDamage);
+    }
+
+    // 방어도를 거치지 않고 체력 감소
+    private void LoseHealth(int amount)
+    {
+        _currentHealth = Mathf.Max(0, _currentHealth - amount);
 
         UpdateUI();
+
+        OnHealthChanged?.Invoke();
     }
 
     private void UpdateUI()
     {
         _healthText.text = $"{_currentHealth} / {_maxHealth}";
-        _poisonText.text = $"중독: {_poisonStack}";
+        _poisonText.text = $"중독: {Status.Poison}";
     }
 }
