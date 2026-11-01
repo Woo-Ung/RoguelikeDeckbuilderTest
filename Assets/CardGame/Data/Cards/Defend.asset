@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 325bb1251223dec40ab8554a9124f001, type: 3}
   m_Name: Defend
   m_EditorClassIdentifier: Assembly-CSharp::CardData
-  _cardName: 
+  _cardName: "\uBC29\uC5B4"
   _cost: 0
-  _effects: []
+  _effects:
+  - _effect: {fileID: 11400000, guid: 8073045bc34d3e84cb4b84fb9194df43, type: 2}
+    _value: 3
