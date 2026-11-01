@@ -1,20 +1,21 @@
 
 using UnityEngine;
+using UnityEngine.Serialization;
 using TMPro;
 
 public class CardCountUI : MonoBehaviour
 {
-    [SerializeField] private CardManager cardManager;
+    [SerializeField, FormerlySerializedAs("cardManager")] private CardManager _cardManager;
 
-    [SerializeField] private TMP_Text deckCountText;
-    [SerializeField] private TMP_Text handCountText;
-    [SerializeField] private TMP_Text discardCountText;
+    [SerializeField, FormerlySerializedAs("deckCountText")] private TMP_Text _deckCountText;
+    [SerializeField, FormerlySerializedAs("handCountText")] private TMP_Text _handCountText;
+    [SerializeField, FormerlySerializedAs("discardCountText")] private TMP_Text _discardCountText;
 
     private void OnEnable()
     {
-        if (cardManager != null)
+        if (_cardManager != null)
         {
-            cardManager.OnCardCountChanged += UpdateCardCountUI;
+            _cardManager.OnCardCountChanged += UpdateCardCountUI;
         }
     }
 
@@ -25,24 +26,24 @@ public class CardCountUI : MonoBehaviour
 
     private void OnDisable()
     {
-        if (cardManager != null)
+        if (_cardManager != null)
         {
-            cardManager.OnCardCountChanged -= UpdateCardCountUI;
+            _cardManager.OnCardCountChanged -= UpdateCardCountUI;
         }
     }
 
     private void UpdateCardCountUI()
     {
-        if (cardManager == null)
+        if (_cardManager == null)
             return;
 
-        deckCountText.text =
-            $"덱: {cardManager.DeckCount}";
+        _deckCountText.text =
+            $"덱: {_cardManager.DeckCount}";
 
-        handCountText.text =
-            $"손패: {cardManager.HandCount}";
+        _handCountText.text =
+            $"손패: {_cardManager.HandCount}";
 
-        discardCountText.text =
-            $"버림 더미: {cardManager.DiscardCount}";
+        _discardCountText.text =
+            $"버림 더미: {_cardManager.DiscardCount}";
     }
 }

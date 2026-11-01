@@ -1,19 +1,20 @@
 
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PlayerEnergy : MonoBehaviour
 {
-    [SerializeField] private int maxEnergy = 3;
+    [SerializeField, FormerlySerializedAs("maxEnergy")] private int _maxEnergy = 3;
 
     public int CurrentEnergy { get; private set; }
-    public int MaxEnergy => maxEnergy;
+    public int MaxEnergy => _maxEnergy;
 
     public event Action OnEnergyChanged;
 
     private void Awake()
     {
-        CurrentEnergy = maxEnergy;
+        CurrentEnergy = _maxEnergy;
     }
 
     public bool CanUseEnergy(int amount)
@@ -35,7 +36,7 @@ public class PlayerEnergy : MonoBehaviour
 
     public void RestoreEnergy()
     {
-        CurrentEnergy = maxEnergy;
+        CurrentEnergy = _maxEnergy;
 
         OnEnergyChanged?.Invoke();
     }

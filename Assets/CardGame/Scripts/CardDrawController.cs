@@ -1,33 +1,34 @@
 
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class CardDrawController : MonoBehaviour
 {
-    [SerializeField] private CardManager cardManager;
-    [SerializeField] private TurnManager turnManager;
-    [SerializeField] private BattleManager battleManager;
-    [SerializeField] private Button drawButton;
+    [SerializeField, FormerlySerializedAs("cardManager")] private CardManager _cardManager;
+    [SerializeField, FormerlySerializedAs("turnManager")] private TurnManager _turnManager;
+    [SerializeField, FormerlySerializedAs("battleManager")] private BattleManager _battleManager;
+    [SerializeField, FormerlySerializedAs("drawButton")] private Button _drawButton;
 
     private void Start()
     {
-        drawButton.onClick.AddListener(Draw);
+        _drawButton.onClick.AddListener(Draw);
     }
 
     private void Draw()
     {
-        if (!battleManager.IsBattleActive ||
-            !turnManager.IsPlayerTurn)
+        if (!_battleManager.IsBattleActive ||
+            !_turnManager.IsPlayerTurn)
         {
             return;
         }
 
-        cardManager.DrawCard();
+        _cardManager.DrawCard();
     }
 
     private void OnDestroy()
     {
-        if (drawButton != null)
-            drawButton.onClick.RemoveListener(Draw);
+        if (_drawButton != null)
+            _drawButton.onClick.RemoveListener(Draw);
     }
 }

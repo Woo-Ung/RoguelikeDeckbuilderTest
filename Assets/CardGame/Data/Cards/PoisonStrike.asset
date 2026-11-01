@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 325bb1251223dec40ab8554a9124f001, type: 3}
   m_Name: PoisonStrike
   m_EditorClassIdentifier: Assembly-CSharp::CardData
-  cardName: "Posion \uC77C\uACA9"
+  cardName: "\uC911\uB3C5 \uC77C\uACA9"
   cost: 1
   effects:
   - effect: {fileID: 11400000, guid: ade05c82fd951ce49831a3da2bfd3532, type: 2}

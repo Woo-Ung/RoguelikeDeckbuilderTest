@@ -7,7 +7,7 @@
 
 ## 프로젝트 제원
 
-- 프로젝트명 : UnityAISetting
+- 프로젝트명 : RoguelikeDeckbuilderTest
 - 장르 : 슬레이 더 스파이어 류의 덱 빌딩 로그라이크 게임
 - 팀 구성 : 1인
 

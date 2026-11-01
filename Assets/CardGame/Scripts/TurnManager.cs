@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using TMPro;
 
@@ -11,12 +12,12 @@ public class TurnManager : MonoBehaviour
         Enemy
     }
 
-    [SerializeField] private Player player;
-    [SerializeField] private Enemy enemy;
-    [SerializeField] private Button endTurnButton;
-    [SerializeField] private TMP_Text turnText;
-    [SerializeField] private BattleManager battleManager;
-    [SerializeField] private PlayerEnergy playerEnergy;
+    [SerializeField, FormerlySerializedAs("player")] private Player _player;
+    [SerializeField, FormerlySerializedAs("enemy")] private Enemy _enemy;
+    [SerializeField, FormerlySerializedAs("endTurnButton")] private Button _endTurnButton;
+    [SerializeField, FormerlySerializedAs("turnText")] private TMP_Text _turnText;
+    [SerializeField, FormerlySerializedAs("battleManager")] private BattleManager _battleManager;
+    [SerializeField, FormerlySerializedAs("playerEnergy")] private PlayerEnergy _playerEnergy;
 
     public event Action OnPlayerTurnStarted;
     public event Action OnPlayerTurnEnded;
@@ -29,18 +30,18 @@ public class TurnManager : MonoBehaviour
 
     private void OnEnable()
     {
-        battleManager.OnBattleEnded += EndBattle;
+        _battleManager.OnBattleEnded += EndBattle;
     }
 
     private void OnDisable()
     {
-        battleManager.OnBattleEnded -= EndBattle;
+        _battleManager.OnBattleEnded -= EndBattle;
     }
 
 
     private void Start()
     {
-        endTurnButton.onClick.AddListener(EndPlayerTurn);
+        _endTurnButton.onClick.AddListener(EndPlayerTurn);
 
         StartPlayerTurn();
     }
@@ -48,15 +49,15 @@ public class TurnManager : MonoBehaviour
 
     private void StartPlayerTurn()
     {
-        if (!battleManager.IsBattleActive)
+        if (!_battleManager.IsBattleActive)
             return;
 
         CurrentTurn = TurnState.Player;
 
-        playerEnergy.RestoreEnergy();
+        _playerEnergy.RestoreEnergy();
 
-        turnText.text = "플레이어 턴";
-        endTurnButton.interactable = true;
+        _turnText.text = "플레이어 턴";
+        _endTurnButton.interactable = true;
 
         OnPlayerTurnStarted?.Invoke();
     }
@@ -64,29 +65,29 @@ public class TurnManager : MonoBehaviour
 
     public void EndPlayerTurn()
     {
-        if (!battleManager.IsBattleActive || !IsPlayerTurn)
+        if (!_battleManager.IsBattleActive || !IsPlayerTurn)
             return;
 
         OnPlayerTurnEnded?.Invoke();
 
         CurrentTurn = TurnState.Enemy;
 
-        turnText.text = "적 턴";
-        endTurnButton.interactable = false;
+        _turnText.text = "적 턴";
+        _endTurnButton.interactable = false;
 
         ProcessEnemyTurn();
     }
 
     private void ProcessEnemyTurn()
     {
-        enemy.ProcessPoison();
+        _enemy.ProcessPoison();
 
-        if (!battleManager.IsBattleActive)
+        if (!_battleManager.IsBattleActive)
             return;
 
-        enemy.Attack(player);
+        _enemy.Attack(_player);
 
-        if (!battleManager.IsBattleActive)
+        if (!_battleManager.IsBattleActive)
             return;
 
         StartPlayerTurn();
@@ -96,17 +97,17 @@ public class TurnManager : MonoBehaviour
 
     public void EndBattle()
     {
-        endTurnButton.interactable = false;
+        _endTurnButton.interactable = false;
 
-        turnText.text = "전투 종료";
+        _turnText.text = "전투 종료";
     }
 
 
     private void OnDestroy()
     {
-        if (endTurnButton != null)
+        if (_endTurnButton != null)
         {
-            endTurnButton.onClick.RemoveListener(EndPlayerTurn);
+            _endTurnButton.onClick.RemoveListener(EndPlayerTurn);
         }
     }
 }

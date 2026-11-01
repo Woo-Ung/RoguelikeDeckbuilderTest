@@ -1,6 +1,7 @@
 
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 using TMPro;
 
 public class BattleManager : MonoBehaviour
@@ -12,9 +13,9 @@ public class BattleManager : MonoBehaviour
         Defeat
     }
 
-    [SerializeField] private Player player;
-    [SerializeField] private Enemy enemy;
-    [SerializeField] private TMP_Text resultText;
+    [SerializeField, FormerlySerializedAs("player")] private Player _player;
+    [SerializeField, FormerlySerializedAs("enemy")] private Enemy _enemy;
+    [SerializeField, FormerlySerializedAs("resultText")] private TMP_Text _resultText;
 
     public BattleState CurrentState { get; private set; }
 
@@ -26,19 +27,19 @@ public class BattleManager : MonoBehaviour
     private void Awake()
     {
         CurrentState = BattleState.Playing;
-        resultText.text = "";
+        _resultText.text = "";
     }
 
     private void OnEnable()
     {
-        player.OnHealthChanged += CheckBattleResult;
-        enemy.OnHealthChanged += CheckBattleResult;
+        _player.OnHealthChanged += CheckBattleResult;
+        _enemy.OnHealthChanged += CheckBattleResult;
     }
 
     private void OnDisable()
     {
-        player.OnHealthChanged -= CheckBattleResult;
-        enemy.OnHealthChanged -= CheckBattleResult;
+        _player.OnHealthChanged -= CheckBattleResult;
+        _enemy.OnHealthChanged -= CheckBattleResult;
     }
 
     public void CheckBattleResult()
@@ -46,15 +47,15 @@ public class BattleManager : MonoBehaviour
         if (!IsBattleActive)
             return;
 
-        if (enemy.IsDead)
+        if (_enemy.IsDead)
         {
             CurrentState = BattleState.Victory;
-            resultText.text = "승리!";
+            _resultText.text = "승리!";
         }
-        else if (player.IsDead)
+        else if (_player.IsDead)
         {
             CurrentState = BattleState.Defeat;
-            resultText.text = "패배!";
+            _resultText.text = "패배!";
         }
         else
         {
