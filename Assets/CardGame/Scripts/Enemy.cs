@@ -5,16 +5,22 @@ using TMPro;
 
 public class Enemy : MonoBehaviour
 {
-    [SerializeField, FormerlySerializedAs("maxHealth")] private int _maxHealth = 50;
-    [SerializeField, FormerlySerializedAs("attackDamage")] private int _attackDamage = 5;
+    [SerializeField] private EnemyData _data;
     [SerializeField, FormerlySerializedAs("healthText")] private TMP_Text _healthText;
     [SerializeField, FormerlySerializedAs("poisonText")] private TMP_Text _poisonText;
+    [SerializeField] private TMP_Text _blockText;
+    [SerializeField] private TMP_Text _intentText;
 
     private int _currentHealth;
+
+    // 다음 턴에 수행할 패턴 순번
+    private int _moveIndex;
 
     public bool IsDead => _currentHealth <= 0;
     public event Action OnHealthChanged;
     public CombatStatus Status { get; } = new CombatStatus();
+
+    private EnemyMove CurrentMove => _data.Moves[_moveIndex];
 
     private void OnEnable()
     {
@@ -28,17 +34,30 @@ public class Enemy : MonoBehaviour
 
     private void Start()
     {
-        _currentHealth = _maxHealth;
+        _currentHealth = _data.MaxHealth;
+        _moveIndex = 0;
 
         UpdateUI();
+        UpdateIntentUI();
     }
 
-    public void Attack(Player player)
+    // 현재 순번의 행동 묶음을 수행하고 다음 순번으로 이동
+    public void PerformMove(Player target)
     {
         if (_currentHealth <= 0)
             return;
 
-        player.TakeDamage(_attackDamage);
+        foreach (EnemyActionEntry entry in CurrentMove.Actions)
+        {
+            if (entry.Action == null)
+                continue;
+
+            entry.Action.Execute(this, target, entry.Value);
+        }
+
+        _moveIndex = (_moveIndex + 1) % _data.Moves.Count;
+
+        UpdateIntentUI();
     }
 
     public void TakeDamage(int damage)
@@ -85,7 +104,13 @@ public class Enemy : MonoBehaviour
 
     private void UpdateUI()
     {
-        _healthText.text = $"{_currentHealth} / {_maxHealth}";
+        _healthText.text = $"{_currentHealth} / {_data.MaxHealth}";
         _poisonText.text = $"중독: {Status.Poison}";
+        _blockText.text = $"방어도: {Status.Block}";
+    }
+
+    private void UpdateIntentUI()
+    {
+        _intentText.text = $"의도: {CurrentMove.GetIntentText()}";
     }
 }
