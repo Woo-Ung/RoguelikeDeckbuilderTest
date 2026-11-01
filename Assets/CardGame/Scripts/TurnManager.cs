@@ -13,7 +13,6 @@ public class TurnManager : MonoBehaviour
     }
 
     [SerializeField, FormerlySerializedAs("player")] private Player _player;
-    [SerializeField, FormerlySerializedAs("enemy")] private Enemy _enemy;
     [SerializeField, FormerlySerializedAs("endTurnButton")] private Button _endTurnButton;
     [SerializeField, FormerlySerializedAs("turnText")] private TMP_Text _turnText;
     [SerializeField, FormerlySerializedAs("battleManager")] private BattleManager _battleManager;
@@ -83,17 +82,24 @@ public class TurnManager : MonoBehaviour
         ProcessEnemyTurn();
     }
 
+    // 살아 있는 적이 순서대로 턴 시작 처리 후 행동
     private void ProcessEnemyTurn()
     {
-        _enemy.StartTurn();
+        foreach (Enemy enemy in _battleManager.Enemies)
+        {
+            if (enemy.IsDead)
+                continue;
 
-        if (!_battleManager.IsBattleActive)
-            return;
+            enemy.StartTurn();
 
-        _enemy.PerformMove(_player);
+            if (!_battleManager.IsBattleActive)
+                return;
 
-        if (!_battleManager.IsBattleActive)
-            return;
+            enemy.PerformMove(_player);
+
+            if (!_battleManager.IsBattleActive)
+                return;
+        }
 
         StartPlayerTurn();
     }

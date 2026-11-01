@@ -11,6 +11,7 @@ public class CardView : MonoBehaviour
     [SerializeField, FormerlySerializedAs("cardBackground")] private Image _cardBackground;
     [SerializeField, FormerlySerializedAs("normalColor")] private Color _normalColor = Color.white;
     [SerializeField, FormerlySerializedAs("selectedColor")] private Color _selectedColor = Color.yellow;
+    [SerializeField] private Color _targetingColor = Color.cyan;
 
     [Header("Card UI")]
     [SerializeField, FormerlySerializedAs("cardNameText")] private TMP_Text _cardNameText;
@@ -30,7 +31,7 @@ public class CardView : MonoBehaviour
     private TurnManager _turnManager;
     private CardInstance _cardInstance;
     private Player _player;
-    private Enemy _target;
+    private TargetingManager _targetingManager;
     private CardSelectionManager _selectionManager;
     private PlayerEnergy _playerEnergy;
     private CardManager _cardManager;
@@ -44,11 +45,18 @@ public class CardView : MonoBehaviour
             isSelected ? _selectedColor : _normalColor;
     }
 
+    // 적 선택을 기다리는 중인지 표시
+    public void SetTargeting(bool isTargeting)
+    {
+        _cardBackground.color =
+            isTargeting ? _targetingColor : _normalColor;
+    }
+
     // 카드 초기화
     public void Initialize(
         CardInstance instance,
         Player player,
-        Enemy enemy,
+        TargetingManager targetingManager,
         CardSelectionManager manager,
         TurnManager turnManager,
         BattleManager battleManager,
@@ -57,7 +65,7 @@ public class CardView : MonoBehaviour
     {
         _cardInstance = instance;
         _player = player;
-        _target = enemy;
+        _targetingManager = targetingManager;
         _selectionManager = manager;
         _turnManager = turnManager;
         _battleManager = battleManager;
@@ -145,21 +153,31 @@ public class CardView : MonoBehaviour
         }
     }
 
-    // 카드 사용
+    // 카드 클릭 : 대상이 필요하면 대상 지정, 필요 없으면 즉시 사용
     private void UseCard()
     {
-        if (_turnManager == null ||
-            _battleManager == null ||
-            _playerEnergy == null ||
-            _cardManager == null ||
-            !_turnManager.IsPlayerTurn ||
-            !_battleManager.IsBattleActive)
+        if (!CanPlay())
+            return;
+
+        if (!_playerEnergy.CanUseEnergy(_cardInstance.CurrentCost))
         {
+            Debug.Log("에너지가 부족합니다.");
             return;
         }
 
-        // 손패에 존재하는 카드인지 확인
-        if (!_cardManager.HasCardInHand(_cardInstance))
+        if (_cardInstance.Data.RequiresTarget)
+        {
+            _targetingManager.ToggleTargeting(this);
+            return;
+        }
+
+        PlayOn(null);
+    }
+
+    // 카드 사용 : 에너지 소비 → 효과 실행 → 버림 더미 이동
+    public void PlayOn(Enemy target)
+    {
+        if (!CanPlay())
             return;
 
         // 에너지 소비
@@ -182,11 +200,27 @@ public class CardView : MonoBehaviour
 
             int value = _cardInstance.GetEffectValue(i);
 
-            entry.Effect.Execute(_player, _target, value);
+            entry.Effect.Execute(_player, target, value);
         }
 
         // 카드 이동은 CardManager가 담당
         _cardManager.PlayCard(_cardInstance);
+    }
+
+    // 플레이어 턴, 전투 진행 중, 손패에 있는 카드인지 확인
+    private bool CanPlay()
+    {
+        if (_turnManager == null ||
+            _battleManager == null ||
+            _playerEnergy == null ||
+            _cardManager == null ||
+            !_turnManager.IsPlayerTurn ||
+            !_battleManager.IsBattleActive)
+        {
+            return false;
+        }
+
+        return _cardManager.HasCardInHand(_cardInstance);
     }
 
 
@@ -238,6 +272,11 @@ public class CardView : MonoBehaviour
         if (_cardManager != null)
         {
             _cardManager.OnCardPlayed -= HandleCardPlayed;
+        }
+
+        if (_targetingManager != null)
+        {
+            _targetingManager.ReleaseCard(this);
         }
     }
 

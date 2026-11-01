@@ -6,6 +6,8 @@ using UnityEngine;
     menuName = "Card Game/Effects/Damage")]
 public class DamageEffect : CardEffect
 {
+    public override bool RequiresTarget => true;
+
     public override void Execute(
         Player player,
         Enemy target,

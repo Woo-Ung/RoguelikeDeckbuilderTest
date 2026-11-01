@@ -9,7 +9,7 @@ public class CardSpawner : MonoBehaviour
 
     [SerializeField, FormerlySerializedAs("cardManager")] private CardManager _cardManager;
     [SerializeField, FormerlySerializedAs("player")] private Player _player;
-    [SerializeField, FormerlySerializedAs("enemy")] private Enemy _enemy;
+    [SerializeField] private TargetingManager _targetingManager;
     [SerializeField, FormerlySerializedAs("selectionManager")] private CardSelectionManager _selectionManager;
     [SerializeField, FormerlySerializedAs("turnManager")] private TurnManager _turnManager;
     [SerializeField, FormerlySerializedAs("battleManager")] private BattleManager _battleManager;
@@ -60,7 +60,7 @@ public class CardSpawner : MonoBehaviour
         card.Initialize(
             instance,
             _player,
-            _enemy,
+            _targetingManager,
             _selectionManager,
             _turnManager,
             _battleManager,

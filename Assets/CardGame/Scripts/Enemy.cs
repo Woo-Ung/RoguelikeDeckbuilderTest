@@ -1,9 +1,10 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using TMPro;
 
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private EnemyData _data;
     [SerializeField, FormerlySerializedAs("healthText")] private TMP_Text _healthText;
@@ -18,6 +19,7 @@ public class Enemy : MonoBehaviour
 
     public bool IsDead => _currentHealth <= 0;
     public event Action OnHealthChanged;
+    public event Action<Enemy> OnClicked;
     public CombatStatus Status { get; } = new CombatStatus();
 
     private EnemyMove CurrentMove => _data.Moves[_moveIndex];
@@ -100,6 +102,19 @@ public class Enemy : MonoBehaviour
         UpdateUI();
 
         OnHealthChanged?.Invoke();
+
+        // 처치된 적은 화면에서 숨김
+        if (IsDead)
+            gameObject.SetActive(false);
+    }
+
+    // 대상 지정을 위한 클릭 입력
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (IsDead)
+            return;
+
+        OnClicked?.Invoke(this);
     }
 
     private void UpdateUI()
