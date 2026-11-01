@@ -90,7 +90,7 @@ public class TurnManager : MonoBehaviour
         if (!_battleManager.IsBattleActive)
             return;
 
-        _enemy.Attack(_player);
+        _enemy.PerformMove(_player);
 
         if (!_battleManager.IsBattleActive)
             return;
